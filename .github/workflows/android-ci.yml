@@ -13,13 +13,10 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-    - name: Build Signed Release APK
-      run: |
-        chmod +x ./gradlew
-        echo "android { signingConfigs { debug { storeFile file("debug.keystore") } } }" >> app/build.gradle.kts
-        ./gradlew assembleRelease -x lint -x lintRelease
-    - name: Upload Signed APK
+    - name: Build Debug APK
+      run: chmod +x ./gradlew && ./gradlew assembleDebug -x lint -x lintDebug
+    - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: navtex-panel-signed.apk
-        path: app/build/outputs/apk/release/*.apk
+        name: navtex-panel.apk
+        path: app/build/outputs/apk/debug/*.apk
