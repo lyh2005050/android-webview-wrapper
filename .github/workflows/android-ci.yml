@@ -13,10 +13,12 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-    - name: Build Debug APK
-      run: chmod +x ./gradlew && ./gradlew assembleDebug -x lint -x lintDebug
-    - name: Upload APK
+    - name: Build Release APK (auto debug sign)
+      run: |
+        chmod +x ./gradlew
+        ./gradlew assembleRelease -x lint -x lintRelease
+    - name: Upload Release APK
       uses: actions/upload-artifact@v4
       with:
-        name: navtex-panel.apk
-        path: app/build/outputs/apk/debug/*.apk
+        name: navtex-panel-release.apk
+        path: app/build/outputs/apk/release/*.apk
