@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>上海海岸台XSG NAVTEX接收面板</title>
+    <title>NAVTEX接收面板</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family:system-ui; }
         body { background:#1a1a1a; color:#ff9500; min-height:100dvh; padding-bottom:80px; }
@@ -44,19 +44,7 @@
     <script>
         setInterval(()=>{
             document.getElementById('clock').textContent = new Date().toLocaleTimeString();
-            fetch('http://150.138.84.87:42768/api/data')
-                .then(r=>r.json())
-                .then(d=>{
-                    document.getElementById('status').textContent = '● 已连接 上海SDR节点';
-                    document.getElementById('status').style.color = '#0f0';
-                    document.getElementById('freq').innerHTML = d.current_freq + '<span style="font-size:20px"> kHz</span>';
-                    document.getElementById('display').textContent = d.xsg || '等待报文...';
-                })
-                .catch(()=>{
-                    document.getElementById('status').textContent = '● 等待SDR连接';
-                    document.getElementById('status').style.color = '#888';
-                })
-        }, 2000);
+        }, 1000);
     </script>
 </body>
 </html>
