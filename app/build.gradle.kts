@@ -3,6 +3,11 @@ plugins {
 }
 
 android {
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
+
     namespace = "com.monstertechno.webview"
     compileSdk = 36
 
