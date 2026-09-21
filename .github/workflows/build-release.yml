@@ -1,0 +1,23 @@
+name: Build and Release APK
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Android
+        run: |
+          sudo apt update
+          sudo apt install -y openjdk-17-jdk wget unzip gradle
+      - name: Build APK
+        run: |
+          gradle assembleDebug
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v1.0.0
+          name: NAVTEX面板 v1.0
+          files: app/build/outputs/apk/debug/*.apk
