@@ -1,347 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebView Bridge Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NAVTEX接收面板</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            margin: 0;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-        .feature-group {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            backdrop-filter: blur(10px);
-        }
-        .feature-group h2 {
-            color: #FFD700;
-            margin-top: 0;
-        }
-        button {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            margin: 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-        button:hover {
-            background: #45a049;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        button:active {
-            transform: translateY(0);
-        }
-        .danger {
-            background: #f44336;
-        }
-        .danger:hover {
-            background: #da190b;
-        }
-        .info {
-            background: #2196F3;
-        }
-        .info:hover {
-            background: #0b7dda;
-        }
-        .warning {
-            background: #ff9800;
-        }
-        .warning:hover {
-            background: #e68900;
-        }
-        #deviceInfo {
-            background: rgba(0,0,0,0.3);
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            font-family: monospace;
-            font-size: 12px;
-        }
-        .demo-section {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        input[type="text"] {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 4px;
-            margin: 5px;
-            width: 200px;
-        }
-        @media (max-width: 600px) {
-            .demo-section {
-                flex-direction: column;
-            }
-            button, input[type="text"] {
-                width: 100%;
-                margin: 5px 0;
-            }
-        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:system-ui; }
+        body { background:#1a1a1a; color:#ff9500; min-height:100dvh; padding-bottom:80px; }
+        .header { padding:20px; display:flex; justify-content:space-between; align-items:center; }
+        .title { font-size:20px; font-weight:bold; }
+        .freq { font-size:80px; font-weight:900; padding:20px; color:#ff9500; }
+        .tabs { display:flex; margin:10px; border-radius:12px; overflow:hidden; background:#2a2a2a; }
+        .tab { flex:1; padding:15px; text-align:center; color:#888; }
+        .tab.active { background:#ff9500; color:#000; font-weight:bold; }
+        .display { margin:10px; padding:20px; background:#222; border-radius:12px; min-height:200px; border:1px solid #ff950033; }
+        .bottom-bar { position:fixed; bottom:0; left:0; right:0; display:flex; padding:10px; gap:10px; background:#1a1a1a; }
+        .btn { flex:1; padding:15px; border-radius:12px; background:#2a2a2a; text-align:center; color:#888; }
+        .btn.active { background:#ff9500; color:#000; font-weight:bold; }
+        .status { padding:0 20px; color:#888; font-size:14px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🚀 Modern WebView Bridge Demo</h1>
-        
-        <div class="feature-group">
-            <h2>📱 Device Information</h2>
-            <div class="demo-section">
-                <button onclick="getDeviceInfo()">Get Device Info</button>
-                <button onclick="getAppInfo()">Get App Info</button>
-                <button onclick="checkFeatures()">Check Features</button>
-            </div>
-            <div id="deviceInfo"></div>
+    <div class="header">
+        <div>
+            <div class="title">上海海岸台XSG</div>
+            <div style="color:#888">NAVTEX实时接收面板</div>
         </div>
-
-        <div class="feature-group">
-            <h2>🔔 Notifications & Feedback</h2>
-            <div class="demo-section">
-                <button onclick="showToast('Hello from WebView!')">Show Toast</button>
-                <button class="warning" onclick="showNotification()">Show Notification</button>
-                <button class="info" onclick="vibrate()">Vibrate Device</button>
-            </div>
-        </div>
-
-        <div class="feature-group">
-            <h2>🔐 Biometric Authentication</h2>
-            <div class="demo-section">
-                <button class="danger" onclick="testFingerprint()">Test Fingerprint</button>
-                <button onclick="checkBiometricSupport()">Check Support</button>
-            </div>
-        </div>
-
-        <div class="feature-group">
-            <h2>📁 File Operations</h2>
-            <div class="demo-section">
-                <input type="text" id="downloadUrl" placeholder="Enter file URL..." value="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf">
-                <button onclick="downloadFile()">Download File</button>
-                <button onclick="shareText()">Share Text</button>
-            </div>
-        </div>
-
-        <div class="feature-group">
-            <h2>📋 Clipboard & Storage</h2>
-            <div class="demo-section">
-                <input type="text" id="clipboardText" placeholder="Text to copy...">
-                <button onclick="setClipboard()">Set Clipboard</button>
-                <button onclick="getClipboard()">Get Clipboard</button>
-            </div>
-        </div>
-
-        <div class="feature-group">
-            <h2>🌐 External Apps</h2>
-            <div class="demo-section">
-                <button onclick="openUrl('https://www.google.com')">Open Google</button>
-                <button onclick="openApp('com.android.settings')">Open Settings</button>
-            </div>
-        </div>
-
-        <div class="feature-group">
-            <h2>🎵 Media Control Demo</h2>
-            <div class="demo-section">
-                <audio id="demoAudio" controls style="width: 100%; margin: 10px 0;">
-                    <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" type="audio/wav">
-                    Your browser does not support the audio element.
-                </audio>
-                <p style="font-size: 12px; opacity: 0.8;">Play audio to test media notification controls</p>
-            </div>
-        </div>
+        <div id="clock">--:--:--</div>
     </div>
-
+    <div class="freq" id="freq">518<span style="font-size:20px"> kHz</span></div>
+    <div class="status" id="status">等待SDR连接...</div>
+    <div class="tabs">
+        <div class="tab active">英文NAVTEX</div>
+        <div class="tab">中文NAVTEX</div>
+        <div class="tab">XSG摩尔斯</div>
+    </div>
+    <div class="display" id="display">等待接收...</div>
+    <div class="bottom-bar">
+        <div class="btn active">518kHz</div>
+        <div class="btn">486kHz</div>
+        <div class="btn">4215kHz</div>
+    </div>
     <script>
-        // Ensure AndroidBridge is available
-        function ensureBridge() {
-            if (typeof AndroidBridge === 'undefined') {
-                alert('Android Bridge not available. Please run this in the WebView app.');
-                return false;
-            }
-            return true;
-        }
-
-        function getDeviceInfo() {
-            if (!ensureBridge()) return;
-            
-            try {
-                const info = JSON.parse(AndroidBridge.getDeviceInfo());
-                document.getElementById('deviceInfo').innerHTML = 
-                    '<strong>Device Information:</strong><br>' +
-                    JSON.stringify(info, null, 2);
-            } catch (e) {
-                document.getElementById('deviceInfo').innerHTML = 
-                    '<strong>Error:</strong> ' + e.message;
-            }
-        }
-
-        function getAppInfo() {
-            if (!ensureBridge()) return;
-            
-            try {
-                const info = JSON.parse(AndroidBridge.getAppInfo());
-                document.getElementById('deviceInfo').innerHTML = 
-                    '<strong>App Information:</strong><br>' +
-                    JSON.stringify(info, null, 2);
-            } catch (e) {
-                document.getElementById('deviceInfo').innerHTML = 
-                    '<strong>Error:</strong> ' + e.message;
-            }
-        }
-
-        function checkFeatures() {
-            if (!ensureBridge()) return;
-            
-            const features = ['fingerprint', 'camera', 'microphone', 'location', 'vibrator'];
-            let result = '<strong>Feature Support:</strong><br>';
-            
-            features.forEach(feature => {
-                const supported = AndroidBridge.isFeatureSupported(feature);
-                result += `${feature}: ${supported ? '✅' : '❌'}<br>`;
-            });
-            
-            document.getElementById('deviceInfo').innerHTML = result;
-        }
-
-        function showToast(message) {
-            if (!ensureBridge()) return;
-            AndroidBridge.showToast(message || 'Hello from WebView!');
-        }
-
-        function showNotification() {
-            if (!ensureBridge()) return;
-            AndroidBridge.showNotification(
-                'WebView Notification',
-                'This is a test notification from the web page!',
-                'https://via.placeholder.com/64'
-            );
-        }
-
-        function vibrate() {
-            if (!ensureBridge()) return;
-            AndroidBridge.vibrate(500);
-            showToast('Device vibrated!');
-        }
-
-        function testFingerprint() {
-            if (!ensureBridge()) return;
-            
-            AndroidBridge.authenticateFingerprint('function(success, message) {' +
-                'AndroidBridge.showToast(success ? "Authentication successful!" : "Auth failed: " + message);' +
-            '}');
-        }
-
-        function checkBiometricSupport() {
-            if (!ensureBridge()) return;
-            
-            const supported = AndroidBridge.isFeatureSupported('fingerprint');
-            showToast(supported ? 'Biometric authentication is available!' : 'Biometric not available');
-        }
-
-        function downloadFile() {
-            if (!ensureBridge()) return;
-            
-            const url = document.getElementById('downloadUrl').value;
-            if (url) {
-                AndroidBridge.downloadFile(url, 'demo_download.pdf');
-                showToast('Download started!');
-            } else {
-                showToast('Please enter a URL');
-            }
-        }
-
-        function shareText() {
-            if (!ensureBridge()) return;
-            AndroidBridge.shareText('Check out this amazing WebView app with JavaScript bridge! 🚀');
-        }
-
-        function setClipboard() {
-            if (!ensureBridge()) return;
-            
-            const text = document.getElementById('clipboardText').value;
-            if (text) {
-                AndroidBridge.setClipboard(text);
-                showToast('Text copied to clipboard!');
-            } else {
-                showToast('Please enter some text');
-            }
-        }
-
-        function getClipboard() {
-            if (!ensureBridge()) return;
-            
-            try {
-                const text = AndroidBridge.getClipboard();
-                document.getElementById('clipboardText').value = text;
-                showToast('Text retrieved from clipboard!');
-            } catch (e) {
-                showToast('Error getting clipboard: ' + e.message);
-            }
-        }
-
-        function openUrl(url) {
-            if (!ensureBridge()) return;
-            AndroidBridge.openUrl(url);
-        }
-
-        function openApp(packageName) {
-            if (!ensureBridge()) return;
-            AndroidBridge.openExternalApp(packageName);
-        }
-
-        // Media control integration
-        const audio = document.getElementById('demoAudio');
-        if (audio) {
-            audio.addEventListener('play', function() {
-                console.log('Audio started playing');
-                // This would typically trigger the media notification service
-            });
-
-            audio.addEventListener('pause', function() {
-                console.log('Audio paused');
-            });
-        }
-
-        // Welcome message
-        window.addEventListener('load', function() {
-            setTimeout(() => {
-                if (typeof AndroidBridge !== 'undefined') {
-                    AndroidBridge.showToast('Welcome to the WebView Bridge Demo! 🎉');
-                }
-            }, 1000);
-        });
-
-        // Add some interactive animations
-        document.addEventListener('DOMContentLoaded', function() {
-            const buttons = document.querySelectorAll('button');
-            buttons.forEach(button => {
-                button.addEventListener('click', function() {
-                    this.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        this.style.transform = '';
-                    }, 150);
-                });
-            });
-        });
+        setInterval(()=>{
+            document.getElementById('clock').textContent = new Date().toLocaleTimeString();
+        }, 1000);
     </script>
 </body>
 </html>
