@@ -13,12 +13,16 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-    - name: Build Release APK (auto debug sign)
+    - name: Generate Keystore and Sign
+      run: |
+        keytool -genkeypair -v -keystore release.keystore -alias navtex -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=Navtex, OU=Radio, O=Radio, L=Shanghai, ST=Shanghai, C=CN"
+    - name: Build Signed APK
       run: |
         chmod +x ./gradlew
         ./gradlew assembleRelease -x lint -x lintRelease
-    - name: Upload Release APK
+        apksigner sign --ks release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out app-release-signed.apk app/build/outputs/apk/release/app-release-unsigned.apk
+    - name: Upload Signed APK
       uses: actions/upload-artifact@v4
       with:
-        name: navtex-panel-release.apk
-        path: app/build/outputs/apk/release/*.apk
+        name: navtex-panel-signed.apk
+        path: app-release-signed.apk
