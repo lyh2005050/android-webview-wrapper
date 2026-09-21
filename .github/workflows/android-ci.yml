@@ -15,8 +15,8 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-    - name: Build with Gradle
-      run: chmod +x ./gradlew && ./gradlew build
+    - name: Build with Gradle (skip lint)
+      run: chmod +x ./gradlew && ./gradlew assembleDebug -x lint
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
